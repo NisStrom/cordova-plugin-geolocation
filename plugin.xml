@@ -94,7 +94,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     </platform>
 
     <!-- windows universal apps (Windows 8.1, Windows Phone 8.1, Windows 8.0) -->
-    <platform name="windows">
+    <platform name="browser">
         <config-file target="package.appxmanifest" parent="/Package/Capabilities">
             <DeviceCapability Name="location" />
         </config-file>
