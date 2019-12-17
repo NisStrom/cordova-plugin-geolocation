@@ -41,6 +41,9 @@
       }
     }
   },
+  "dependecies": {
+    "winjs": "^4.4.3"
+  },
   "devDependencies": {
     "eslint": "^4.0.0",
     "eslint-config-semistandard": "^11.0.0",
