@@ -17,6 +17,7 @@
 /* global Windows, WinJS */
 
 var PositionError = require('./PositionError');
+const { Geolocator, GeolocationAccessStatus, PositionStatus, PositionAccuracy } = require('windows.devices.geolocation')
 var callbacks = {};
 var locs = {};
 
@@ -26,21 +27,21 @@ var FALLBACK_EPSILON = 0.001;
 function ensureAndCreateLocator () {
     var deferral;
 
-    var loc = new Windows.Devices.Geolocation.Geolocator();
+    var loc = new Geolocator();
 
-    if (typeof Windows.Devices.Geolocation.Geolocator.requestAccessAsync === 'function') {
-        deferral = Windows.Devices.Geolocation.Geolocator.requestAccessAsync().then(function (result) {
-            if (result === Windows.Devices.Geolocation.GeolocationAccessStatus.allowed) {
+    if (typeof loc.RequestAccessAsync === 'function') {
+        deferral = loc.RequestAccessAsync().then(function (result) {
+            if (result === GeolocationAccessStatus.allowed) {
                 return loc;
             }
 
-            return WinJS.Promise.wrapError({
+            return Promise.reject({
                 code: PositionError.PERMISSION_DENIED,
                 message: 'Geolocation access has not been allowed by user.'
             });
         });
     } else {
-        deferral = WinJS.Promise.wrap(loc);
+        deferral = Promise.resolve(loc);
     }
 
     return deferral;
@@ -49,19 +50,19 @@ function ensureAndCreateLocator () {
 function createErrorCode (loc) {
     /* eslint-disable no-fallthrough */
     switch (loc.locationStatus) {
-    case Windows.Devices.Geolocation.PositionStatus.initializing:
+    case PositionStatus.initializing:
     // This status indicates that a location device is still initializing
-    case Windows.Devices.Geolocation.PositionStatus.noData:
+    case PositionStatus.noData:
     // No location data is currently available
-    case Windows.Devices.Geolocation.PositionStatus.notInitialized:
+    case PositionStatus.notInitialized:
     // This status indicates that the app has not yet requested
     // location data by calling GetGeolocationAsync() or
     // registering an event handler for the positionChanged event.
-    case Windows.Devices.Geolocation.PositionStatus.notAvailable:
+    case PositionStatus.notAvailable:
         // Location is not available on this version of Windows
         return PositionError.POSITION_UNAVAILABLE;
 
-    case Windows.Devices.Geolocation.PositionStatus.disabled:
+    case PositionStatus.disabled:
         // The app doesn't have permission to access location,
         // either because location has been turned off.
         return PositionError.PERMISSION_DENIED;
@@ -101,12 +102,12 @@ module.exports = {
                 var maxAge = args[1];
 
                 loc.desiredAccuracy = highAccuracy ?
-                    Windows.Devices.Geolocation.PositionAccuracy.high :
-                    Windows.Devices.Geolocation.PositionAccuracy.default;
+                    PositionAccuracy.high :
+                    PositionAccuracy.default;
 
                 loc.reportInterval = maxAge || 0;
 
-                loc.getGeopositionAsync().then(
+                loc.getGeoPositionAsync().then(
                     function (pos) {
                         success(createResult(pos));
                     },
@@ -137,15 +138,15 @@ module.exports = {
 
             var onStatusChanged = function (e) {
                 switch (e.status) {
-                case Windows.Devices.Geolocation.PositionStatus.noData:
-                case Windows.Devices.Geolocation.PositionStatus.notAvailable:
+                case PositionStatus.noData:
+                case PositionStatus.notAvailable:
                     fail({
                         code: PositionError.POSITION_UNAVAILABLE,
                         message: 'Data from location services is currently unavailable or you do not have the required location services present on your system.'
                     });
                     break;
 
-                case Windows.Devices.Geolocation.PositionStatus.disabled:
+                case PositionStatus.disabled:
                     fail({
                         code: PositionError.PERMISSION_DENIED,
                         message: 'Your location is currently turned off.'
@@ -159,19 +160,19 @@ module.exports = {
                 }
             };
 
-            loc.desiredAccuracy = highAccuracy ?
-                Windows.Devices.Geolocation.PositionAccuracy.high :
-                Windows.Devices.Geolocation.PositionAccuracy.default;
+            loc.DesiredAccuracy = highAccuracy ?
+                PositionAccuracy.high :
+                PositionAccuracy.default;
 
-            if (cordova.platformId === 'windows') { // eslint-disable-line no-undef
+            if (cordova.platformId === 'browser') { // eslint-disable-line no-undef
                 // 'positionchanged' event fails with error below if movementThreshold is not set
                 // JavaScript runtime error: Operation aborted
                 // You must set the MovementThreshold property or the ReportInterval property before adding event handlers.
                 // WinRT information: You must set the MovementThreshold property or the ReportInterval property before adding event handlers
                 if (Number.EPSILON) {
-                    loc.movementThreshold = Number.EPSILON;
+                    loc.MovementThreshold = Number.EPSILON;
                 } else {
-                    loc.movementThreshold = FALLBACK_EPSILON;
+                    loc.MovementThreshold = FALLBACK_EPSILON;
                 }
             }
 
