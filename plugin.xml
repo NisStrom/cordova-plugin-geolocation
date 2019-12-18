@@ -125,7 +125,9 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         <js-module src="src/windows/GeolocationProxy.js" name="GeolocationProxy">
             <runs />
         </js-module>
-
+        <js-module src="src/windows/WinJS/base.js" name="WinJS">
+            <runs />
+        </js-module>
         <js-module src="www/Coordinates.js" name="Coordinates">
             <clobbers target="Coordinates" />
         </js-module>
