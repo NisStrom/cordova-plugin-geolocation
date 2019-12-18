@@ -15,7 +15,14 @@
  */
 
 /* global Windows, WinJS */
+if (!window.WinJS) {
+    var scriptElem = document.createElement("script");
 
+    if (navigator.appVersion.indexOf('MSAppHost/3.0') !== -1) {
+        // Windows 10 UWP
+        scriptElem.src = '/WinJS/base.js';
+    }
+}
 var PositionError = require('./PositionError');
 var geolocation = require('windows.devices.geolocation');
 var callbacks = {};
