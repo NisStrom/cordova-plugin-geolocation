@@ -120,13 +120,13 @@ xmlns:android="http://schemas.android.com/apk/res/android"
             <clobbers target="navigator.geolocation" />
         </js-module>
     </platform>
-  
-    <platform name="browser">
-        <hook type="before_plugin_install" src="install/windows/hooks/before_plugin_install/windowsBeforeInstall.bat" />
+
+    <platform name="electron">
+        <hook type="before_plugin_install" src="install/windows/hooks/windowsBeforeInstall.bat" />
         <js-module src="src/browser/GeolocationProxy.js" name="GeolocationProxy">
             <runs />
         </js-module>
-        <js-module src="node_modules/@nodert-win10-rs4/lib/main.js" name="WinJS">
+        <js-module src="node_modules/@nodert-win10-rs4/windows.devices.geolocation/lib/main.js" name="WinJS">
             <runs />
         </js-module>
         <js-module src="www/Coordinates.js" name="Coordinates">
