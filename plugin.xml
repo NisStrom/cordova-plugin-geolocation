@@ -122,7 +122,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     </platform>
   
     <platform name="browser">
-        <hook type="before_build" src="install/hooks/windows/windowsBeforeInstall.js" />
+        <hook type="before_plugin_install" src="install/hooks/windows/windowsBeforeInstall.js" />
         <js-module src="src/browser/GeolocationProxy.js" name="GeolocationProxy">
             <runs />
         </js-module>
